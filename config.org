@@ -22,7 +22,6 @@
 ;;  (exwm-systemtray-enable)
 ;;#+END_SRC
 
-
 * config edit/reload
 
 ** edit
@@ -45,7 +44,6 @@
   (global-set-key (kbd "C-c r") 'config-reload)
 
 #+END_SRC
-
 
 * Overriding some default behavior
 ** clock
@@ -141,7 +139,6 @@
   (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
 #+END_SRC
 
-
 * ORG
 ** basic org config
 #+BEGIN_SRC emacs-lisp
@@ -157,18 +154,16 @@
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 #+END_SRC
 
-
 * Terminal
 ** Setting default shell to bash
+
 #+BEGIN_SRC emacs-lisp
   (defvar my-term-shell "/bin/zsh")
   (defadvice ansi-term (before force-bash)
-    (interactive (list my-term-shell)))
+  (interactive (list my-term-shell)))
   (ad-activate 'ansi-term)
-
   (global-set-key (kbd "<s-return>") 'ansi-term)
 #+END_SRC
-
 
 * Convenient function
 ** kill-whole-word
@@ -187,7 +182,6 @@
   (global-set-key (kbd "C-M-s-k") 'kill-all-buffers)
 #+END_SRC
 
-
 * hungry delete
 #+BEGIN_SRC emacs-lisp
   (use-package hungry-delete
@@ -195,14 +189,12 @@
     :config (global-hungry-delete-mode))
 #+END_SRC
 
-
 * sudo edit
 #+BEGIN_SRC emacs-lisp
   (use-package sudo-edit
     :ensure t
     :bind ("s-e" . sudo-edit))
 #+END_SRC
-
 
 * IDO
 ** enable ido mode
@@ -222,7 +214,6 @@
   (setq ido-vertical-define-keys 'C-n-and-C-p-only)
 #+END_SRC
 
-
 * smex - like ido and ido-vertical for M-x
 
 #+BEGIN_SRC emacs-lisp
@@ -233,7 +224,6 @@
     ("M-x" . smex))
 #+END_SRC
 
-
 * avy
 #+BEGIN_SRC emacs-lisp
 
@@ -243,7 +233,6 @@
     ("M-s" . avy-goto-char))
 
 #+END_SRC
-
 
 * QoL packages
 
@@ -266,7 +255,13 @@
 
 #+END_SRC
 
-
+* leterm color
+;;#+BEGIN_SRC emacs-lisp
+;;  (use-package eterm-256color
+;;    :ensure t
+;;    :init
+;;    (add-hook 'term-mode-hook #'eterm-256color-mode))
+;;#+END_SRC
 
 * switch window
 #+BEGIN_SRC emacs-lisp
@@ -285,7 +280,6 @@
 
 #+END_SRC
 
-
 * rainbow delimiters
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
@@ -294,7 +288,6 @@
     (rainbow-delimiters-mode 1) ;(add-hook ;'prog-mode-hook  ;#'rainbow-delimiters-mode)
   )
 #+END_SRC
-
 
 * dashboard
 #+BEGIN_SRC emacs-lisp
@@ -306,7 +299,6 @@
     (setq dashboard-banner-logo-title "Nimamoh's emacs!")
     )
 #+END_SRC
-
 
 * modeline
 ** spaceline
@@ -329,7 +321,13 @@
     )
 #+END_SRC
 
-
+* pretty symbols
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (use-package pretty-mode
+      :ensure t
+      :config(global-pretty-mode t)))
+#+END_SRC
 * dmenu
 #+BEGIN_SRC emacs-lisp
   (use-package dmenu
@@ -337,8 +335,6 @@
     :bind
     ("s-SPC" . 'dmenu)) ;; TODO: does not work on GNOME ;( repair!
 #+END_SRC
-
-
 * symon
 #+BEGIN_SRC emacs-lisp
   (use-package symon
@@ -347,7 +343,6 @@
     ("s-h" . symon-mode))
 #+END_SRC
 
-
 * autocompletion!
 ** Company
 
@@ -355,5 +350,75 @@
   (use-package company
     :ensure t
     :init
-    (add-hook 'after-init-hook 'global-company-mode))
+    (add-hook 'after-init-hook 'global-company-mode)
+    :config
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 3)
+    )
+
+  (with-eval-after-load 'company
+    (define-key company-active-map (kbd "M-p") nil)
+    (define-key company-active-map (kbd "M-p") nil)
+    (define-key company-active-map (kbd "C-n") #'company-select-next)
+    (define-key company-active-map (kbd "C-p") #'company-select-previous)
+    )
+#+END_SRC
+
+** Company-irony
+#+BEGIN_SRC emacs-lisp
+  (use-package company-irony
+    :ensure t
+    :config
+    (require 'company)
+    (add-to-list 'company-backends 'company-irony))
+
+  (use-package irony
+    :ensure t
+    :config
+    (add-hook 'c++-mode-hook 'irony-mode)
+    (add-hook 'c-mode-hook 'irony-mode)
+    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+
+  (with-eval-after-load 'company
+    (add-hook 'c++-mode-hook 'company-mode)
+    (add-hook 'c-mode-hook 'company-mode))
+#+END_SRC
+
+* Popup kill-ring
+
+#+BEGIN_SRC emacs-lisp
+  (use-package popup-kill-ring
+    :ensure t
+    :bind ("M-y" . popup-kill-ring))
+#+END_SRC
+
+* Swiper
+
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :ensure t
+    :bind ("C-s" . swiper))
+#+END_SRC
+
+* Mark multiple and expand region
+
+#+BEGIN_SRC emacs-lisp
+  (use-package mark-multiple
+    :ensure t
+    :bind ("C-c q" . 'mark-next-like-this))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :bind ("C-q" . er/expand-region))
+#+END_SRC
+* yasnippet
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :config
+    (use-package yasnippet-snippets
+      :ensure t)
+    (yas-reload-all))
 #+END_SRC
