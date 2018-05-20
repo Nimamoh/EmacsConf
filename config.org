@@ -1,3 +1,28 @@
+* exwn
+;;#+BEGIN_SRC emacs-lisp
+;;  (use-package exwm
+;;    :ensure t
+;;    :config
+;;    (require 'exwm)
+;;    (require 'exwm-config)
+;;    (exwm-config-default)
+;;    )
+
+;;  (require 'exwm-randr)
+;;  (setq exwm-randr-workspace-output-plist '(1 "DP-1"))
+;;  (add-hook 'exwm-randr-screen-change-hook
+;;            (lambda ()
+;;              (start-process-shell-command
+;;               "xrandr" nil "xrandr --output DVI-I-1 --right-of DP-1 --auto")))
+;;  (exwm-randr-enable)
+
+;;#+END_SRC
+;;#+BEGIN_SRC emacs-lisp
+;;  (require 'exwm-systemtray)
+;;  (exwm-systemtray-enable)
+;;#+END_SRC
+
+
 * config edit/reload
 
 ** edit
@@ -23,6 +48,23 @@
 
 
 * Overriding some default behavior
+** clock
+#+BEGIN_SRC emacs-lisp
+  (setq display-time-24hr-format t)
+  (display-time-mode 1)
+#+END_SRC
+** always kill current buffer
+#+BEGIN_SRC emacs-lisp
+  (defun kill-current-buffer ()
+    (interactive)
+    (kill-buffer (current-buffer)))
+  (global-set-key (kbd "C-x k") 'kill-current-buffer)
+#+END_SRC
+** show line and columns on the modeline
+#+BEGIN_SRC emacs-lisp
+  (line-number-mode 1)
+  (column-number-mode 1)
+#+END_SRC
 ** better default buffer list - ibufer
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x b") 'ibuffer)
@@ -36,6 +78,13 @@
 ** Enable show parenthesis as default
 #+BEGIN_SRC emacs-lisp
   (show-paren-mode 1)
+#+END_SRC
+** autocomplete parenthesis
+#+BEGIN_SRC emacs-lisp
+  (setq electric-pair-pairs '(
+                              (?\( . ?\))
+                              ))
+  (electric-pair-mode t)
 #+END_SRC
 ** Disable help as startpage
 #+BEGIN_SRC emacs-lisp
@@ -75,7 +124,31 @@
 (global-hl-line-mode t)
 
 #+END_SRC
+** window splitting function - focus on new window
+#+BEGIN_SRC emacs-lisp
+  (defun split-and-follow-horizontally ()
+    (interactive)
+    (split-window-below)
+    (balance-windows)
+    (other-window 1))
+  (global-set-key (kbd "C-x 2") 'split-and-follow-horizontally)
 
+  (defun split-and-follow-vertically ()
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1))
+  (global-set-key (kbd "C-x 3") 'split-and-follow-vertically)
+#+END_SRC
+
+
+* ORG
+** basic org config
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-window-setup 'current-window)
+  (add-to-list 'org-structure-template-alist
+               '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+#+END_SRC
 ** Enable org bullets
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
@@ -84,6 +157,51 @@
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
 #+END_SRC
 
+
+* Terminal
+** Setting default shell to bash
+#+BEGIN_SRC emacs-lisp
+  (defvar my-term-shell "/bin/zsh")
+  (defadvice ansi-term (before force-bash)
+    (interactive (list my-term-shell)))
+  (ad-activate 'ansi-term)
+
+  (global-set-key (kbd "<s-return>") 'ansi-term)
+#+END_SRC
+
+
+* Convenient function
+** kill-whole-word
+#+BEGIN_SRC emacs-lisp
+  (defun kill-whole-word()
+    (interactive)
+    (backward-word)
+    (kill-word 1))
+  (global-set-key (kbd "C-c w w") 'kill-whole-word)
+#+END_SRC
+** kill-all-buffers
+#+BEGIN_SRC emacs-lisp
+  (defun kill-all-buffers ()
+    (interactive)
+    (mapc 'kill-buffer (buffer-list)))
+  (global-set-key (kbd "C-M-s-k") 'kill-all-buffers)
+#+END_SRC
+
+
+* hungry delete
+#+BEGIN_SRC emacs-lisp
+  (use-package hungry-delete
+    :ensure t
+    :config (global-hungry-delete-mode))
+#+END_SRC
+
+
+* sudo edit
+#+BEGIN_SRC emacs-lisp
+  (use-package sudo-edit
+    :ensure t
+    :bind ("s-e" . sudo-edit))
+#+END_SRC
 
 
 * IDO
@@ -150,13 +268,92 @@
 
 
 
-* Terminal
-** Setting default shell to bash
+* switch window
 #+BEGIN_SRC emacs-lisp
-  (defvar my-term-shell "/bin/zsh")
-  (defadvice ansi-term (before force-bash)
-    (interactive (list my-term-shell)))
-  (ad-activate 'ansi-term)
 
-  (global-set-key (kbd "<s-return>") 'ansi-term)
+  (use-package switch-window
+    :ensure t
+    :config
+    (setq switch-window-input-style 'minibuffer)
+    (setq switch-window-increase 4)
+    (setq switch-window-threshhold 2)
+    (setq switch-window-shortcut-style 'qwerty)
+    (setq switch-window-qwerty-shortcuts
+          '("q" "s" "d" "f" "h" "j" "k" "l"))
+    :bind
+    ([remap other-window] . switch-window))
+
+#+END_SRC
+
+
+* rainbow delimiters
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :init
+    (rainbow-delimiters-mode 1) ;(add-hook ;'prog-mode-hook  ;#'rainbow-delimiters-mode)
+  )
+#+END_SRC
+
+
+* dashboard
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+    :ensure t
+    :config
+    (dashboard-setup-startup-hook)
+    (setq dashboard-items '((recents . 10)))
+    (setq dashboard-banner-logo-title "Nimamoh's emacs!")
+    )
+#+END_SRC
+
+
+* modeline
+** spaceline
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :ensure t
+    :config
+    (require 'spaceline-config)
+    (setq powerline-default-separator (quote arrow))
+    (spaceline-spacemacs-theme))
+#+END_SRC
+** diminish
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t
+    :init
+    (diminish 'hungry-delete-mode)
+    (diminish 'beacon-mode)
+    (diminish 'which-key-mode)
+    )
+#+END_SRC
+
+
+* dmenu
+#+BEGIN_SRC emacs-lisp
+  (use-package dmenu
+    :ensure t
+    :bind
+    ("s-SPC" . 'dmenu)) ;; TODO: does not work on GNOME ;( repair!
+#+END_SRC
+
+
+* symon
+#+BEGIN_SRC emacs-lisp
+  (use-package symon
+    :ensure t
+    :bind
+    ("s-h" . symon-mode))
+#+END_SRC
+
+
+* autocompletion!
+** Company
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :ensure t
+    :init
+    (add-hook 'after-init-hook 'global-company-mode))
 #+END_SRC
