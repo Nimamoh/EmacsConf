@@ -1,0 +1,162 @@
+* config edit/reload
+
+** edit
+#+BEGIN_SRC emacs-lisp
+
+  (defun config-visit ()
+    (interactive)
+    (find-file "~/.emacs.d/config.org"))
+
+  (global-set-key (kbd "C-c e") 'config-visit)
+
+#+END_SRC
+
+** reload
+#+BEGIN_SRC emacs-lisp
+
+  (defun config-reload()
+    (interactive)
+    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+  (global-set-key (kbd "C-c r") 'config-reload)
+
+#+END_SRC
+
+
+* Overriding some default behavior
+** better default buffer list - ibufer
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-x b") 'ibuffer)
+#+END_SRC
+** switch buffers
+#+BEGIN_SRC emacs-lisp
+
+  (global-set-key (kbd "C-x C-b") 'ido-switch-buffer)
+
+#+END_SRC
+** Enable show parenthesis as default
+#+BEGIN_SRC emacs-lisp
+  (show-paren-mode 1)
+#+END_SRC
+** Disable help as startpage
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-message t)
+#+END_SRC
+** Hide tool/menu/scroll
+#+BEGIN_SRC emacs-lisp
+
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+
+#+END_SRC
+** y/p instead of yes/no
+#+BEGIN_SRC emacs-lisp
+
+  (defalias 'yes-or-no-p 'y-or-n-p)
+
+#+END_SRC
+
+** Smoother scrolling
+#+BEGIN_SRC emacs-lisp
+
+(setq scroll-conservatively 100)
+
+#+END_SRC
+
+** Stop ringing the bell!
+
+#+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+#+END_SRC
+
+** Highlight the current line
+#+BEGIN_SRC emacs-lisp
+
+(global-hl-line-mode t)
+
+#+END_SRC
+
+** Enable org bullets
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+#+END_SRC
+
+
+
+* IDO
+** enable ido mode
+#+BEGIN_SRC emacs-lisp
+  (setq ide-enable-flex-matching nil)
+  (setq ide-create-new-buffer 'always)
+  (setq ide-everywhere t)
+  (ido-mode 1)
+#+END_SRC
+
+** ido-vertical
+#+BEGIN_SRC emacs-lisp
+  (use-package ido-vertical-mode
+    :ensure t
+    :init
+    (ido-vertical-mode 1))
+  (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+#+END_SRC
+
+
+* smex - like ido and ido-vertical for M-x
+
+#+BEGIN_SRC emacs-lisp
+  (use-package smex
+    :ensure t
+    :init (smex-initialize)
+    :bind
+    ("M-x" . smex))
+#+END_SRC
+
+
+* avy
+#+BEGIN_SRC emacs-lisp
+
+  (use-package avy
+    :ensure t
+    :bind
+    ("M-s" . avy-goto-char))
+
+#+END_SRC
+
+
+* QoL packages
+
+** which key - interactive help when typing commands
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :init
+    (which-key-mode))
+#+END_SRC
+
+** beacon - animation on cursor when changing window
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package beacon
+    :ensure t
+    :init
+    (beacon-mode 1))
+
+#+END_SRC
+
+
+
+* Terminal
+** Setting default shell to bash
+#+BEGIN_SRC emacs-lisp
+  (defvar my-term-shell "/bin/zsh")
+  (defadvice ansi-term (before force-bash)
+    (interactive (list my-term-shell)))
+  (ad-activate 'ansi-term)
+
+  (global-set-key (kbd "<s-return>") 'ansi-term)
+#+END_SRC
