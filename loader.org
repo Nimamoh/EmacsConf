@@ -124,8 +124,13 @@ The package
 
 Dimish mode
 #+BEGIN_SRC emacs-lisp
-(use-package diminish
-  :ensure t)
+  (use-package diminish
+    :ensure t
+    :init
+    (diminish 'which-key-mode)
+    (diminish 'beacon-mode)
+    (diminish 'company-mode)
+    (diminish 'snippet-mode))
 #+END_SRC
 * Debug
 ** command log mode
@@ -135,6 +140,21 @@ Dimish mode
   (setq global-command-log-mode 1)
 
 
+#+END_SRC
+** edit/reload config
+#+BEGIN_SRC emacs-lisp
+  (defun find-config-file ()
+    (interactive)
+    (find-file "~/.emacs.d/loader.org"))
+
+  (global-set-key (kbd "C-c e") 'find-config-file)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun config-reload ()
+    "Reloads ~/.emacs.d/config.org at runtime"
+    (interactive)
+    (org-babel-load-file (expand-file-name "~/.emacs.d/loader.org")))
+  (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
 * Theming
 #+BEGIN_SRC emacs-lisp
@@ -325,13 +345,23 @@ Dimish mode
 (scroll-bar-mode -1)
 #+END_SRC
 
+** beacon mode - cursor highlight when changing context
+#+BEGIN_SRC emacs-lisp
+  (use-package beacon
+    :ensure t
+    :init (beacon-mode 1))
+#+END_SRC
 ** dashboard
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard
         :ensure t
         :config
         (dashboard-setup-startup-hook)
-        (setq dashboard-items '((recents . 10)))
+        (setq dashboard-items '(
+                                (recents . 10)
+                                (projects . 10)
+                                (agenda . 10)
+                                ))
         (setq dashboard-banner-logo-title "Nimamoh's emacs!")
         (setq dashboard-startup-banner 'logo)
         (setq dashboard-banner-logo-png "/home/rog/.emacs.d/chikungunya.png")
