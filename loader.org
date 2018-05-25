@@ -130,7 +130,7 @@ Dimish mode
     (diminish 'which-key-mode)
     (diminish 'beacon-mode)
     (diminish 'company-mode)
-    (diminish 'snippet-mode))
+    )
 #+END_SRC
 * Debug
 ** command log mode
@@ -430,7 +430,7 @@ Dimish mode
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :ensure t
-    :diminish yas
+    :diminish (yas-minor-mode)
     :config
     (yas/global-mode 1)
     (add-to-list 'yas-snippet-dirs (concat init-dir "snippets")))
