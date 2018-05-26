@@ -153,20 +153,6 @@ The package
     (spaceline-compile))
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
-* Theming
-#+BEGIN_SRC emacs-lisp
-  ;; Load the tomorow theme. Also set the color mode
-  (when (window-system)
-    (use-package color-theme-sanityinc-tomorrow
-      :ensure t
-      :config
-      (load-theme 'sanityinc-tomorrow-eighties t)))
-
-
-  (when (window-system)
-    (set-default-font "Hack"))
-
-#+END_SRC
 * Move around
 ** y/n
 #+BEGIN_SRC emacs-lisp
@@ -345,6 +331,17 @@ The package
 #+BEGIN_SRC emacs-lisp
   (toggle-frame-fullscreen)
 #+END_SRC
+** EXWM
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package exwm
+  ;;   :ensure t)
+  ;; (require 'exwm)
+  ;; (require 'exwm-config)
+  ;; (exwm-config-default)
+
+  ;; (use-package dmenu
+  ;;   :ensure t)
+#+END_SRC
 ** beacon mode - cursor highlight when changing context
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
@@ -369,6 +366,7 @@ The package
 #+END_SRC
 ** Modeline
 #+BEGIN_SRC emacs-lisp
+
   (use-package fancy-battery
     :ensure t
     :config
@@ -389,6 +387,8 @@ The package
   ;;    spaceline-highlight-face-func 'spaceline-highlight-face-modified)
   ;; (spaceline-compile)
 
+
+  ;; TODO: re enable?
   ;; custom mode-line
   (use-package spaceline-config :ensure spaceline
     :config
@@ -418,6 +418,59 @@ The package
         (battery)
         (org-clock)
         (buffer-encoding))))
+#+END_SRC
+** Theming
+#+BEGIN_SRC emacs-lisp
+  ;; Load the tomorow theme. Also set the color mode
+
+  ;; tomorrow themes
+  (when (window-system)
+    (use-package color-theme-sanityinc-tomorrow
+      :ensure t
+      :config
+      (load-theme 'sanityinc-tomorrow-eighties t)))
+
+  ;; zenburn theme
+  ;; (use-package zenburn-theme
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'zenburn t))
+
+
+  ;; doom theme
+  ;; (use-package all-the-icons
+  ;;   :ensure t)
+  ;; (use-package doom-themes
+  ;;   :ensure t
+  ;;   :config
+  ;;   (setq doom-themes-enable-bold t)
+  ;;   (setq doom-themes-enable-italic t)
+  ;;   (load-theme 'doom-one)
+  ;;   (doom-themes-visual-bell-config)
+  ;;   (doom-themes-neotree-config)
+  ;;   (doom-themes-org-config))
+
+
+  ;; Moe theme
+  ;; (use-package moe-theme
+  ;;   :ensure t)
+  ;; (moe-dark)
+  ;; (moe-theme-set-color 'orange)
+  ;; (powerline-moe-theme)
+
+  ;; Darktooth
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; (use-package darktooth-theme ;;
+  ;;   :ensure t)                 ;;
+  ;; (load-theme 'darktooth)      ;;
+  ;; (darktooth-modeline)         ;;
+  ;; (darktooth-modeline-one)     ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+  (when (window-system)
+    (set-default-font "Hack"))
+
 #+END_SRC
 * General programming
 ** s package, hydra, prettify symbols
@@ -498,10 +551,19 @@ The package
     (define-key company-active-map (kbd "C-p") #'company-select-previous)
     )
 #+END_SRC
-** magit
+** git
+*** magit
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure t)
+#+END_SRC
+*** diff-hl
+#+BEGIN_SRC emacs-lisp
+  (use-package diff-hl
+    :ensure t
+    :init
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+    (global-diff-hl-mode 1))
 #+END_SRC
 * Clojure
 ** CIDER
