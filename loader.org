@@ -122,15 +122,13 @@ The package
    (init--install-packages)))
 #+END_SRC
 
-Dimish mode
+** Diminish mode for diminishing the rest of the config
 #+BEGIN_SRC emacs-lisp
   (use-package diminish
-    :ensure t
-    :init
-    (diminish 'which-key-mode)
-    (diminish 'beacon-mode)
+    :config
     (diminish 'company-mode)
-    )
+    (diminish 'paredit-mode)
+    (diminish 'ivy-mode))
 #+END_SRC
 * Debug
 ** command log mode
@@ -138,8 +136,6 @@ Dimish mode
   (use-package command-log-mode
     :ensure t)
   (setq global-command-log-mode 1)
-
-
 #+END_SRC
 ** edit/reload config
 #+BEGIN_SRC emacs-lisp
@@ -153,20 +149,22 @@ Dimish mode
   (defun config-reload ()
     "Reloads ~/.emacs.d/config.org at runtime"
     (interactive)
-    (org-babel-load-file (expand-file-name "~/.emacs.d/loader.org")))
+    (org-babel-load-file (expand-file-name "~/.emacs.d/loader.org"))
+    (spaceline-compile))
   (global-set-key (kbd "C-c r") 'config-reload)
 #+END_SRC
 * Theming
 #+BEGIN_SRC emacs-lisp
-(when (window-system)
-  (use-package color-theme-sanityinc-tomorrow
-    :ensure t
-    :config
-    (load-theme 'sanityinc-tomorrow-eighties t)))
+  ;; Load the tomorow theme. Also set the color mode
+  (when (window-system)
+    (use-package color-theme-sanityinc-tomorrow
+      :ensure t
+      :config
+      (load-theme 'sanityinc-tomorrow-eighties t)))
 
 
-(when (window-system)
-  (set-default-font "Hack"))
+  (when (window-system)
+    (set-default-font "Hack"))
 
 #+END_SRC
 * Move around
@@ -188,7 +186,6 @@ Dimish mode
 
      (use-package swiper
        :pin melpa-stable
-       :diminish ivy-mode
        :ensure t
        :bind*
        (("C-s" . swiper)
@@ -330,7 +327,6 @@ Dimish mode
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
   :ensure t
-  :diminish which-key-mode
   :config
   (which-key-mode))
 #+END_SRC
@@ -345,6 +341,10 @@ Dimish mode
 (scroll-bar-mode -1)
 #+END_SRC
 
+** turn on fullscreen
+#+BEGIN_SRC emacs-lisp
+  (toggle-frame-fullscreen)
+#+END_SRC
 ** beacon mode - cursor highlight when changing context
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
@@ -369,9 +369,55 @@ Dimish mode
 #+END_SRC
 ** Modeline
 #+BEGIN_SRC emacs-lisp
-  (use-package powerline
-    :ensure t)
-  (powerline-default-theme)
+  (use-package fancy-battery
+    :ensure t
+    :config
+    (add-hook 'after-init-hook #'fancy-battery-mode)
+    :init
+    (setq fancy-battery-show-percentage t))
+
+  (use-package spaceline :ensure t)
+
+  ;;(spaceline-emacs-theme)
+  ;; (spaceline-emacs-theme)
+  ;; (spaceline-toggle-battery-on)
+  ;; (spaceline-toggle-projectile-root-on)
+  ;; (spaceline-toggle-minor-modes-off)
+
+  ;; (setq-default
+  ;;    powerline-default-separator 'wave
+  ;;    spaceline-highlight-face-func 'spaceline-highlight-face-modified)
+  ;; (spaceline-compile)
+
+  ;; custom mode-line
+  (use-package spaceline-config :ensure spaceline
+    :config
+
+    (setq-default
+     mode-line-format '("%e" (:eval (spaceline-ml-main)))
+     powerline-default-separator 'wave
+     spaceline-highlight-face-func 'spaceline-highlight-face-modified)
+
+    ;; custom date segment
+    (spaceline-define-segment me/clock
+      "A simple clock"
+      ;;(shell-command-to-string "date +%B-%d%_H:%M:%S+")
+      (string-trim-right
+       (shell-command-to-string "echo \"`date +%d` `date +%B` `date +%H:%M`\" "))
+      )
+
+    ;; build the mode-lines
+    (spaceline-install
+      '((major-mode :face highlight-face)
+        ((remote-host buffer-id line) :separator ":")
+        ((flycheck-error flycheck-warning flycheck-info))
+        ((projectile-root version-control) :separator ":")
+        )
+      '((global :separator ":")
+        (me/clock)
+        (battery)
+        (org-clock)
+        (buffer-encoding))))
 #+END_SRC
 * General programming
 ** s package, hydra, prettify symbols
@@ -388,7 +434,6 @@ Dimish mode
 #+BEGIN_SRC emacs-lisp
   (use-package paredit
     :ensure t
-    :diminish paredit-mode
     :config
     (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
     (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
@@ -402,13 +447,11 @@ Dimish mode
   ;; Ensure paredit is used EVERYWHERE!
   (use-package paredit-everywhere
     :ensure t
-    :diminish paredit-everywhere-mode
     :config
     (add-hook 'list-mode-hook #'paredit-everywhere-mode))
 
   (use-package highlight-parentheses
     :ensure t
-    :diminish highlight-parentheses-mode
     :config
     (add-hook 'emacs-lisp-mode-hook
               (lambda()
@@ -430,7 +473,6 @@ Dimish mode
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :ensure t
-    :diminish (yas-minor-mode)
     :config
     (yas/global-mode 1)
     (add-to-list 'yas-snippet-dirs (concat init-dir "snippets")))
@@ -444,7 +486,7 @@ Dimish mode
   (use-package company
     :ensure t
     :config
-    (setq company-idle-delay 0.1)
+      (setq company-idle-delay 0.1)
     (setq company-minimum-prefix-length 2)
     (global-company-mode)
   )
