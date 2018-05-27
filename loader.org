@@ -121,15 +121,6 @@ The package
    (package-refresh-contents)
    (init--install-packages)))
 #+END_SRC
-
-** Diminish mode for diminishing the rest of the config
-#+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :config
-    (diminish 'company-mode)
-    (diminish 'paredit-mode)
-    (diminish 'ivy-mode))
-#+END_SRC
 * Debug
 ** command log mode
 #+BEGIN_SRC emacs-lisp
@@ -330,6 +321,15 @@ The package
 ** turn on fullscreen
 #+BEGIN_SRC emacs-lisp
   (toggle-frame-fullscreen)
+#+END_SRC
+** line numbering
+#+BEGIN_SRC emacs-lisp
+  (use-package nlinum
+    :ensure t)
+  (use-package nlinum-relative
+    :ensure t
+    :init
+    (global-nlinum-relative-mode 1))
 #+END_SRC
 ** EXWM
 #+BEGIN_SRC emacs-lisp
