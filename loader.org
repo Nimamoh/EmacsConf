@@ -323,13 +323,17 @@ The package
   (toggle-frame-fullscreen)
 #+END_SRC
 ** line numbering
+
+From emacs 26-1 linum and co are not the best alternative
 #+BEGIN_SRC emacs-lisp
-  (use-package nlinum
-    :ensure t)
-  (use-package nlinum-relative
-    :ensure t
-    :init
-    (global-nlinum-relative-mode 1))
+  ;; (use-package nlinum
+  ;;   :ensure t)
+  ;; (use-package nlinum-relative
+  ;;   :ensure t
+  ;;   :init
+  ;;   (global-nlinum-relative-mode 1))
+
+  (global-display-line-numbers-mode 1)
 #+END_SRC
 ** EXWM
 #+BEGIN_SRC emacs-lisp
