@@ -410,6 +410,7 @@ The package
     (spaceline-install
       '((major-mode :face highlight-face)
         ((remote-host buffer-id line) :separator ":")
+        (process)
         ((flycheck-error flycheck-warning flycheck-info))
         ((projectile-root version-control) :separator ":")
         )
