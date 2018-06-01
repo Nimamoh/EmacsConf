@@ -235,12 +235,13 @@ The package
   (defun toggle-maximize-buffer () "Maximize buffer"
     (interactive)
     (if (= 1 (length (window-list)))
-        (jump-to-register '_) 
+	(jump-to-register '_) 
       (progn
-        (window-configuration-to-register '_)
-        (delete-other-windows))))
+	(window-configuration-to-register '_)
+	(delete-other-windows))))
 
   (global-set-key (kbd "C-x _") 'toggle-maximize-buffer)
+  (global-set-key (kbd "C-x 8") 'toggle-maximize-buffer)
 #+END_SRC
 ** switch windows
 #+BEGIN_SRC emacs-lisp
@@ -320,7 +321,7 @@ The package
 
 ** turn on fullscreen
 #+BEGIN_SRC emacs-lisp
-  (toggle-frame-fullscreen)
+  ;; (toggle-frame-fullscreen)
 #+END_SRC
 ** line numbering
 
@@ -545,7 +546,7 @@ From emacs 26-1 linum and co are not the best alternative
     :ensure t
     :config
       (setq company-idle-delay 0.1)
-    (setq company-minimum-prefix-length 2)
+    (setq company-minimum-prefix-length 1)
     (global-company-mode)
   )
 
@@ -579,34 +580,63 @@ From emacs 26-1 linum and co are not the best alternative
     :config
     (add-hook 'cider-repl-mode-hook #'company-mode)
     (add-hook 'cider-mode-hook #'company-mode)
-    (add-hook 'cider-mode-hook #'eldoc-mode)
-    (add-hook 'cider-mode-hook #'cider-hydra-mode)
-    (add-hook 'clojure-mode-hook #'paredit-mode)
-    (setq cider-repl-use-pretty-printing t)
-    (setq cider-repl-display-help-banner nil)
-    (setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))")
 
-    :bind
-    ;; TODO: bindings
-     ;; (("M-r" . cider-namespace-refresh)
-     ;;        ("C-c r" . cider-repl-reset)
-     ;;        ("C-c ." . cider-reset-test-run-tests))
-    )
+    (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
+    (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+
+    (add-hook 'cider-mode-hook #'eldoc-mode)
+    (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
+    (add-hook 'cider-repl-mode #'eldoc-mode)
+
+    (setq cider-font-lock-dynamically '(macro core function var)))
 
   (use-package clj-refactor
     :ensure t
+    :pin melpa-stable
     :config
-    (add-hook 'clojure-mode-hook (lambda ()
-                                   (clj-refactor-mode 1)
-                                   ;; insert keybinding setup here
-                                   ))
-    (cljr-add-keybindings-with-prefix "C-c C-m")
-    (setq cljr-warn-on-eval nil)
-    :bind ("C-c '" . hydra-cljr-help-menu/body)
-    )
+    (defun my-clj-refactor-mode-hook ()
+      (clj-refactor-mode 1)
+      (yas-minor-mode 1)
+      (cljr-add-keybindings-with-prefix "C-c C-m"))
+    (add-hook 'clojure-mode-hook #'my-clj-refactor-mode-hook)
+    (setq cljr-warn-on-eval nil))
 
-  ;; HYDRA
-  ;; (load-library (concat init-dir "cider-hydra.el"))
+  ;; (use-package cider
+  ;;   :ensure t
+  ;;   ;; I want bleeding edge version
+  ;;   ;; :pin melpa-stable
+  ;;   :config
+  ;;   (add-hook 'cider-repl-mode-hook #'company-mode)
+  ;;   (add-hook 'cider-mode-hook #'company-mode)
+  ;;   (add-hook 'cider-mode-hook #'eldoc-mode)
+  ;;   (add-hook 'cider-mode-hook #'cider-hydra-mode)
+  ;;   (add-hook 'clojure-mode-hook #'paredit-mode)
+  ;;   (setq cider-repl-use-pretty-printing t)
+  ;;   (setq cider-repl-display-help-banner nil)
+  ;;   (setq cider-cljs-lein-repl "(do (use 'figwheel-sidecar.repl-api) (start-figwheel!) (cljs-repl))")
+
+  ;;   :bind
+  ;;   ;; TODO: bindings
+  ;;    ;; (("M-r" . cider-namespace-refresh)
+  ;;    ;;        ("C-c r" . cider-repl-reset)
+  ;;    ;;        ("C-c ." . cider-reset-test-run-tests))
+  ;;   )
+
+  ;; (use-package clj-refactor
+  ;;   :ensure t
+  ;;   :config
+  ;;   (add-hook 'clojure-mode-hook (lambda ()
+  ;; 				 (clj-refactor-mode 1)
+  ;; 				 ;; insert keybinding setup here
+  ;; 				 ))
+  ;;   (cljr-add-keybindings-with-prefix "C-c C-m")
+  ;;   (setq cljr-warn-on-eval nil)
+  ;;   :bind ("C-c '" . hydra-cljr-help-menu/body)
+  ;;   )
+
+  ;; ;; HYDRA
+  ;; ;; (load-library (concat init-dir "cider-hydra.el
+  ;;"))
   ;; (require 'cider-hydra)
 #+END_SRC
 
